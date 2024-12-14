@@ -32,7 +32,7 @@
 #include "rclcpp/duration.hpp"
 #include "rclcpp/logging.hpp"
 #include "rclcpp/time.hpp"
-#include "realtime_tools/thread_priority.hpp"
+#include "realtime_tools/realtime_helpers.hpp"
 
 namespace realtime_tools
 {
@@ -156,6 +156,18 @@ public:
    */
   T get_last_return_value() const { return async_callback_return_; }
 
+  /// Get the current callback time
+  /**
+   * @return The current callback time
+   */
+  const rclcpp::Time & get_current_callback_time() const { return current_callback_time_; }
+
+  /// Get the current callback period
+  /**
+   * @return The current callback period
+   */
+  const rclcpp::Duration & get_current_callback_period() const { return current_callback_period_; }
+
   /// Resets the internal variables of the AsyncFunctionHandler
   /**
    * A method to reset the internal variables of the AsyncFunctionHandler.
@@ -169,7 +181,9 @@ public:
     std::unique_lock<std::mutex> lock(async_mtx_);
     stop_async_callback_ = false;
     trigger_in_progress_ = false;
-    last_execution_time_ = 0.0;
+    current_callback_time_ = rclcpp::Time(0, 0, RCL_CLOCK_UNINITIALIZED);
+    current_callback_period_ = rclcpp::Duration(0, 0);
+    last_execution_time_ = std::chrono::nanoseconds(0);
     async_callback_return_ = T();
     async_exception_ptr_ = nullptr;
   }
@@ -222,6 +236,12 @@ public:
    */
   std::thread & get_thread() { return thread_; }
 
+  /// Get the const version of async worker thread
+  /**
+   * @return The async callback thread
+   */
+  const std::thread & get_thread() const { return thread_; }
+
   /// Check if the async callback method is in progress
   /**
    * @return True if the async callback method is in progress, false otherwise
@@ -247,9 +267,12 @@ public:
 
   /// Get the last execution time of the async callback method
   /**
-   * @return The last execution time of the async callback method in seconds
+   * @return The last execution time of the async callback method in nanoseconds
    */
-  double get_last_execution_time() const { return last_execution_time_; }
+  std::chrono::nanoseconds get_last_execution_time() const
+  {
+    return last_execution_time_.load(std::memory_order_relaxed);
+  }
 
   /// Initializes and starts the callback thread
   /**
@@ -289,7 +312,8 @@ public:
                 async_exception_ptr_ = std::current_exception();
               }
               const auto end_time = std::chrono::steady_clock::now();
-              last_execution_time_ = std::chrono::duration<double>(end_time - start_time).count();
+              last_execution_time_ =
+                std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time);
             }
             trigger_in_progress_ = false;
           }
@@ -300,7 +324,7 @@ public:
   }
 
 private:
-  rclcpp::Time current_callback_time_;
+  rclcpp::Time current_callback_time_ = rclcpp::Time(0, 0, RCL_CLOCK_UNINITIALIZED);
   rclcpp::Duration current_callback_period_{0, 0};
 
   std::function<T(const rclcpp::Time &, const rclcpp::Duration &)> async_function_;
@@ -315,7 +339,7 @@ private:
   std::condition_variable async_callback_condition_;
   std::condition_variable cycle_end_condition_;
   std::mutex async_mtx_;
-  std::atomic<double> last_execution_time_;
+  std::atomic<std::chrono::nanoseconds> last_execution_time_;
   std::exception_ptr async_exception_ptr_;
 };
 }  // namespace realtime_tools

@@ -2,6 +2,47 @@
 Changelog for package realtime_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.0.0 (2024-12-03)
+------------------
+* remove unused state\_ field (`#215 <https://github.com/ros-controls/realtime_tools/issues/215>`_)
+* Bump version of pre-commit hooks (`#213 <https://github.com/ros-controls/realtime_tools/issues/213>`_)
+* Add job for clang build (`#207 <https://github.com/ros-controls/realtime_tools/issues/207>`_)
+* Add support to parse multiple cores for setting CPU affinity (`#208 <https://github.com/ros-controls/realtime_tools/issues/208>`_)
+* Adapt API style of lock_memory to match the one of the other functions (`#209 <https://github.com/ros-controls/realtime_tools/issues/209>`_)
+* Move the header files to `.hpp` extension (`#206 <https://github.com/ros-controls/realtime_tools/issues/206>`_)
+* Use windows CI build (`#204 <https://github.com/ros-controls/realtime_tools/issues/204>`_)
+* Add downstream build CI job (`#201 <https://github.com/ros-controls/realtime_tools/issues/201>`_)
+* Fix RealtimeBox broken API + `realtime_box_best_effort.h` proper deprecation (`#202 <https://github.com/ros-controls/realtime_tools/issues/202>`_)
+* Replace existing RealtimeBox implementation with RealtimeBoxBestEffort implementation (`#146 <https://github.com/ros-controls/realtime_tools/issues/146>`_)
+* Overloading the set_thread_affinity method for Windows compatibility (`#193 <https://github.com/ros-controls/realtime_tools/issues/193>`_)
+* Remove iron workflows and update readme (`#184 <https://github.com/ros-controls/realtime_tools/issues/184>`_)
+* Add method to get the current callback time and period (`#192 <https://github.com/ros-controls/realtime_tools/issues/192>`_)
+* Use pthread_setaffinity_np for setting affinity rather than sched_setaffinity (`#190 <https://github.com/ros-controls/realtime_tools/issues/190>`_)
+* Add the same compile flags as with ros2_controllers and fix errors (`#185 <https://github.com/ros-controls/realtime_tools/issues/185>`_)
+* Contributors: Christoph Fröhlich, Gilmar Correia, Lennart Nachtigall, Sai Kishor Kothakota, github-actions[bot]
+
+2.8.1 (2024-11-05)
+------------------
+* Fix libcap-dev dependency (`#189 <https://github.com/ros-controls/realtime_tools/issues/189>`_)
+  Update libcap-dev dependency
+* Contributors: Sai Kishor Kothakota
+
+2.8.0 (2024-11-04)
+------------------
+* Add methods to set the thread affinity (`#186 <https://github.com/ros-controls/realtime_tools/issues/186>`_)
+* Fix pre-commit of `#187 <https://github.com/ros-controls/realtime_tools/issues/187>`_ (`#188 <https://github.com/ros-controls/realtime_tools/issues/188>`_)
+* Removing thread_priority.hpp warning for Windows Systems (`#187 <https://github.com/ros-controls/realtime_tools/issues/187>`_)
+* Fix build error with clang (`#183 <https://github.com/ros-controls/realtime_tools/issues/183>`_)
+* Bump version of pre-commit hooks (`#182 <https://github.com/ros-controls/realtime_tools/issues/182>`_)
+* [AsyncFunctionHandler] return execution time in nanoseconds (`#181 <https://github.com/ros-controls/realtime_tools/issues/181>`_)
+* Rename thread_priority to realtime_helpers header (`#178 <https://github.com/ros-controls/realtime_tools/issues/178>`_)
+* Include <functional> in realtime_box_best_effort (`#173 <https://github.com/ros-controls/realtime_tools/issues/173>`_)
+* Bump version of pre-commit hooks (`#171 <https://github.com/ros-controls/realtime_tools/issues/171>`_)
+* Add fixes to the code to work for the windows systems (`#180 <https://github.com/ros-controls/realtime_tools/issues/180>`_)
+* Update thread_priority.cpp (`#170 <https://github.com/ros-controls/realtime_tools/issues/170>`_)
+* Add a helper method to lock the pages of memory in the RAM (`#175 <https://github.com/ros-controls/realtime_tools/issues/175>`_)
+* Contributors: Christoph Fröhlich, Felix Exner (fexner), Gilmar Correia, Luca Della Vedova, Sai Kishor Kothakota, github-actions[bot]
+
 2.7.0 (2024-10-29)
 ------------------
 * [AsyncFunctionHandler] Add exception handling (`#172 <https://github.com/ros-controls/realtime_tools/issues/172>`_)
