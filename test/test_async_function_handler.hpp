@@ -25,7 +25,7 @@ namespace realtime_tools
 {
 enum class return_type : std::uint8_t {
   OK = 0,
-  ERROR = 1,
+  FAILURE = 1,
   DEACTIVATE = 2,
 };
 
@@ -49,6 +49,10 @@ public:
   void activate();
 
   void deactivate();
+
+  void reset_counter(int counter = 0);
+
+  void set_return_state(return_type return_state);
 
 private:
   rclcpp_lifecycle::State state_;
