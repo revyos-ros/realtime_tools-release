@@ -1,0 +1,55 @@
+From 41077ac44261e0f1baf10e53f728e0390053c1ab Mon Sep 17 00:00:00 2001
+From: Zheng Junjie <zhengjunjie@iscas.ac.cn>
+Date: Thu, 19 Dec 2024 09:14:21 +0800
+Subject: [PATCH 2/2] Revert "u"
+
+This reverts commit 7d0f815e9c57176d30dce239cdef528e88548c93.
+---
+ debian/patches/0001-pr-183.patch | 26 --------------------------
+ debian/patches/series            |  1 -
+ 2 files changed, 27 deletions(-)
+ delete mode 100644 debian/patches/0001-pr-183.patch
+ delete mode 100644 debian/patches/series
+
+diff --git a/debian/patches/0001-pr-183.patch b/debian/patches/0001-pr-183.patch
+deleted file mode 100644
+index 1811425..0000000
+--- a/debian/patches/0001-pr-183.patch
++++ /dev/null
+@@ -1,26 +0,0 @@
+-From 703e9c5b6ffe8593d7f1483ecca7de4b11743f7c Mon Sep 17 00:00:00 2001
+-From: Zheng Junjie <zhengjunjie@iscas.ac.cn>
+-Date: Mon, 4 Nov 2024 12:20:21 +0800
+-Subject: [PATCH] pr 183
+-
+-https://github.com/ros-controls/realtime_tools/commit/842081161b18f034ba4ebc032b7762ccf5cce970
+----
+- include/realtime_tools/realtime_box_best_effort.h | 2 +-
+- 1 file changed, 1 insertion(+), 1 deletion(-)
+-
+-diff --git a/include/realtime_tools/realtime_box_best_effort.h b/include/realtime_tools/realtime_box_best_effort.h
+-index 4763c5a..4e5d614 100644
+---- a/include/realtime_tools/realtime_box_best_effort.h
+-+++ b/include/realtime_tools/realtime_box_best_effort.h
+-@@ -70,7 +70,7 @@ public:
+-   template <typename U = T>
+-   constexpr RealtimeBoxBestEffort(
+-     const std::initializer_list<U> & init,
+--    std::enable_if_t<std::is_constructible_v<U, std::initializer_list>>)
+-+    std::enable_if_t<std::is_constructible_v<U, std::initializer_list<U>>>)
+-   : value_(init)
+-   {
+-   }
+--- 
+-2.46.0
+-
+diff --git a/debian/patches/series b/debian/patches/series
+deleted file mode 100644
+index 8a87d24..0000000
+--- a/debian/patches/series
++++ /dev/null
+@@ -1 +0,0 @@
+-0001-pr-183.patch
+-- 
+2.46.0
+

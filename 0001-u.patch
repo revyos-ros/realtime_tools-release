@@ -1,7 +1,7 @@
-From 1a8dcf934985dfd12d378283e196b97bf18fb44c Mon Sep 17 00:00:00 2001
+From 7d0f815e9c57176d30dce239cdef528e88548c93 Mon Sep 17 00:00:00 2001
 From: Zheng Junjie <zhengjunjie@iscas.ac.cn>
 Date: Mon, 4 Nov 2024 12:21:31 +0800
-Subject: [PATCH] u
+Subject: [PATCH 1/2] u
 
 ---
  debian/patches/0001-pr-183.patch | 26 ++++++++++++++++++++++++++
