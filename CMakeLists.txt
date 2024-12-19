@@ -2,7 +2,20 @@ cmake_minimum_required(VERSION 3.16)
 project(realtime_tools LANGUAGES CXX)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "(GNU|Clang)")
-  add_compile_options(-Wall -Wextra)
+  add_compile_options(-Wall -Wextra -Wpedantic -Werror=conversion -Werror=unused-but-set-variable
+  -Werror=return-type -Werror=shadow -Werror=format)
+endif()
+
+if(WIN32)
+  add_compile_definitions(
+    # For math constants
+    _USE_MATH_DEFINES
+    # Minimize Windows namespace collision
+    NOMINMAX
+    WIN32_LEAN_AND_MEAN
+  )
+  # set the same behavior for windows as it is on linux
+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
@@ -19,6 +32,7 @@ endforeach()
 
 add_library(realtime_tools SHARED
   src/realtime_clock.cpp
+  src/realtime_helpers.cpp
 )
 target_compile_features(realtime_tools PUBLIC cxx_std_17)
 target_include_directories(realtime_tools PUBLIC
@@ -26,10 +40,13 @@ target_include_directories(realtime_tools PUBLIC
   $<INSTALL_INTERFACE:include/realtime_tools>
 )
 ament_target_dependencies(realtime_tools PUBLIC ${THIS_PACKAGE_INCLUDE_DEPENDS})
+if(UNIX)
+  target_link_libraries(realtime_tools PUBLIC cap)
+endif()
 
 # A library to detect a realtime kernel and set thread priority, if one is found
 add_library(thread_priority SHARED
-  src/thread_priority.cpp
+  src/realtime_helpers.cpp
 )
 target_compile_features(thread_priority PUBLIC cxx_std_17)
 target_include_directories(thread_priority PUBLIC
@@ -37,6 +54,9 @@ target_include_directories(thread_priority PUBLIC
   $<INSTALL_INTERFACE:include/realtime_tools>
 )
 ament_target_dependencies(thread_priority PUBLIC ${THIS_PACKAGE_INCLUDE_DEPENDS})
+if(UNIX)
+  target_link_libraries(thread_priority PUBLIC cap)
+endif()
 
 # Unit Tests
 if(BUILD_TESTING)
@@ -45,11 +65,11 @@ if(BUILD_TESTING)
   find_package(rclcpp_lifecycle REQUIRED)
   find_package(test_msgs REQUIRED)
 
+  ament_add_gmock(thread_priority_tests test/thread_priority_tests.cpp)
+  target_link_libraries(thread_priority_tests thread_priority)
+
   ament_add_gmock(realtime_box_tests test/realtime_box_tests.cpp)
   target_link_libraries(realtime_box_tests realtime_tools)
-
-  ament_add_gmock(realtime_box_best_effort_tests test/realtime_box_best_effort_tests.cpp)
-  target_link_libraries(realtime_box_best_effort_tests realtime_tools)
 
   ament_add_gmock(realtime_buffer_tests test/realtime_buffer_tests.cpp)
   target_link_libraries(realtime_buffer_tests realtime_tools)
