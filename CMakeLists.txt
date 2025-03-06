@@ -39,7 +39,6 @@ if(NOT Boost_headers_FOUND)
 endif()
 
 add_library(realtime_tools SHARED
-  src/realtime_clock.cpp
   src/realtime_helpers.cpp
 )
 target_compile_features(realtime_tools PUBLIC cxx_std_17)
@@ -79,9 +78,6 @@ if(BUILD_TESTING)
   ament_add_gmock(realtime_box_tests test/realtime_box_tests.cpp)
   target_link_libraries(realtime_box_tests realtime_tools)
 
-  ament_add_gmock(realtime_box_best_effort_tests test/realtime_box_best_effort_tests.cpp)
-  target_link_libraries(realtime_box_best_effort_tests realtime_tools)
-
   ament_add_gmock(realtime_buffer_tests test/realtime_buffer_tests.cpp)
   target_link_libraries(realtime_buffer_tests realtime_tools)
 
@@ -93,15 +89,6 @@ if(BUILD_TESTING)
     # without adding atomic, clang throws a linker error
     target_link_libraries(lock_free_queue_tests realtime_tools atomic Boost::boost)
   endif()
-
-  ament_add_gmock(realtime_clock_tests test/realtime_clock_tests.cpp)
-  target_link_libraries(realtime_clock_tests realtime_tools)
-
-  ament_add_gmock(realtime_publisher_tests_non_polling
-                  test/realtime_publisher_non_polling.test
-                  test/realtime_publisher_tests_non_polling.cpp)
-  target_link_libraries(realtime_publisher_tests_non_polling realtime_tools)
-  ament_target_dependencies(realtime_publisher_tests_non_polling test_msgs)
 
   ament_add_gmock(realtime_publisher_tests
                   test/realtime_publisher.test
