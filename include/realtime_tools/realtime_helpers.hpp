@@ -35,8 +35,11 @@
 #include <vector>
 
 #ifdef _WIN32
-#include <windows.h>
-using NATIVE_THREAD_HANDLE = HANDLE;
+// Here we directly use void* instead of including windows.h
+// and using HANDLE macro to avoid polluting all the downstream
+// compilation units that include the public header realtime_helpers.hpp
+// with problematic macros like MIN, MAX or ERROR
+using NATIVE_THREAD_HANDLE = void *;
 #else
 using NATIVE_THREAD_HANDLE = pthread_t;
 #endif
@@ -55,19 +58,6 @@ bool has_realtime_kernel();
  * \returns true if configuring scheduler succeeded
  */
 bool configure_sched_fifo(int priority);
-
-/**
- * Locks the memory pages of the calling thread to prevent page faults.
- * By calling this method, the programs locks all pages mapped into the address
- * space of the calling process and future mappings. This means that the kernel
- * will not swap out the pages to disk i.e., the pages are guaranteed to stay in
- * RAM until later unlocked - which is important for realtime applications.
- * \param[out] message a message describing the result of the operation
- * \returns true if memory locking succeeded, false otherwise.
-*/
-
-[[deprecated("Use std::pair<bool, std::string> lock_memory() instead.")]]
-bool lock_memory(std::string & message);
 
 /**
  * Locks the memory pages of the calling thread to prevent page faults.
