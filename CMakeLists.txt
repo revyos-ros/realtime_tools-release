@@ -30,8 +30,15 @@ foreach(Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
   find_package(${Dependency} REQUIRED)
 endforeach()
 
+if(POLICY CMP0167)
+  cmake_policy(SET CMP0167 NEW)
+endif()
+find_package(Boost COMPONENTS headers)
+if(NOT Boost_headers_FOUND)
+  find_package(Boost REQUIRED)
+endif()
+
 add_library(realtime_tools SHARED
-  src/realtime_clock.cpp
   src/realtime_helpers.cpp
 )
 target_compile_features(realtime_tools PUBLIC cxx_std_17)
@@ -74,14 +81,14 @@ if(BUILD_TESTING)
   ament_add_gmock(realtime_buffer_tests test/realtime_buffer_tests.cpp)
   target_link_libraries(realtime_buffer_tests realtime_tools)
 
-  ament_add_gmock(realtime_clock_tests test/realtime_clock_tests.cpp)
-  target_link_libraries(realtime_clock_tests realtime_tools)
-
-  ament_add_gmock(realtime_publisher_tests_non_polling
-                  test/realtime_publisher_non_polling.test
-                  test/realtime_publisher_tests_non_polling.cpp)
-  target_link_libraries(realtime_publisher_tests_non_polling realtime_tools)
-  ament_target_dependencies(realtime_publisher_tests_non_polling test_msgs)
+  ament_add_gmock(lock_free_queue_tests test/lock_free_queue_tests.cpp)
+  if(WIN32)
+    # atomic is not found on Windows, but also not needed
+    target_link_libraries(lock_free_queue_tests realtime_tools Boost::boost)
+  else()
+    # without adding atomic, clang throws a linker error
+    target_link_libraries(lock_free_queue_tests realtime_tools atomic Boost::boost)
+  endif()
 
   ament_add_gmock(realtime_publisher_tests
                   test/realtime_publisher.test
@@ -98,6 +105,11 @@ if(BUILD_TESTING)
   ament_add_gmock(test_async_function_handler test/test_async_function_handler.cpp)
   target_link_libraries(test_async_function_handler realtime_tools thread_priority)
   ament_target_dependencies(test_async_function_handler lifecycle_msgs rclcpp_lifecycle)
+
+  if(NOT WIN32)
+    ament_add_gmock(realtime_mutex_tests test/realtime_mutex_tests.cpp)
+    target_link_libraries(realtime_mutex_tests realtime_tools)
+  endif()
 endif()
 
 # Install
