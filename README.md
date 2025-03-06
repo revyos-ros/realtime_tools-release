@@ -1,3 +1,26 @@
+## realtime_tools (humble) - 2.12.0-1
+
+The packages in the `realtime_tools` repository were released into the `humble` distro by running `/root/venv/bin/bloom-release -r humble realtime_tools --override-release-repository-push-url git@github.com:revyos-ros/realtime_tools-release.git` on `Thu, 06 Mar 2025 03:48:11 -0000`
+
+The `realtime_tools` package was released.
+
+Version of package(s) in repository `realtime_tools`:
+
+- upstream repository: https://github.com/ros-controls/realtime_tools.git
+- release repository: https://github.com/revyos-ros/realtime_tools-release.git
+- rosdistro version: `2.12.0-1`
+- old version: `2.11.0-1`
+- new version: `2.12.0-1`
+
+Versions of tools used:
+
+- bloom version: `0.12.0`
+- catkin_pkg version: `1.0.0`
+- rosdep version: `0.25.1`
+- rosdistro version: `1.0.1`
+- vcstools version: `0.1.42`
+
+
 ## realtime_tools (humble) - 2.11.0-1
 
 The packages in the `realtime_tools` repository were released into the `humble` distro by running `/home/z572/gits/revyos-ros/venv2/bin/bloom-release -r humble realtime_tools --override-release-repository-push-url git@github.com:revyos-ros/realtime_tools-release.git` on `Mon, 17 Feb 2025 03:33:30 -0000`
