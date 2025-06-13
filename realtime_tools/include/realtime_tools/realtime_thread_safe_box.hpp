@@ -30,8 +30,8 @@
 // Author: Stuart Glaser
 // Author: Lennart Nachtigall
 
-#ifndef REALTIME_TOOLS__REALTIME_BOX_HPP_
-#define REALTIME_TOOLS__REALTIME_BOX_HPP_
+#ifndef REALTIME_TOOLS__REALTIME_THREAD_SAFE_BOX_HPP_
+#define REALTIME_TOOLS__REALTIME_THREAD_SAFE_BOX_HPP_
 
 #include <functional>
 #include <initializer_list>
@@ -40,6 +40,14 @@
 #include <utility>
 
 #include <rcpputils/pointer_traits.hpp>
+#ifndef _WIN32
+#include "realtime_tools/mutex.hpp"
+#define DEFAULT_MUTEX realtime_tools::prio_inherit_mutex
+#define RECURSIVE_MUTEX realtime_tools::prio_inherit_recursive_mutex
+#else
+#define DEFAULT_MUTEX std::mutex
+#define RECURSIVE_MUTEX std::recursive_mutex
+#endif
 
 namespace realtime_tools
 {
@@ -55,8 +63,8 @@ constexpr auto is_ptr_or_smart_ptr = rcpputils::is_pointer<T>::value;
     You can use pointers with this box but the access will be different.
     Only use the get/set methods that take function pointer for accessing the internal value.
 */
-template <class T, typename mutex_type = std::mutex>
-class RealtimeBoxBase
+template <class T, typename mutex_type = DEFAULT_MUTEX>
+class RealtimeThreadSafeBox
 {
   static_assert(std::is_copy_constructible_v<T>, "Passed type must be copy constructible");
 
@@ -64,11 +72,11 @@ public:
   using mutex_t = mutex_type;
   using type = T;
   // Provide various constructors
-  constexpr explicit RealtimeBoxBase(const T & init = T{}) : value_(init) {}
-  constexpr explicit RealtimeBoxBase(const T && init) : value_(std::move(init)) {}
+  constexpr explicit RealtimeThreadSafeBox(const T & init = T{}) : value_(init) {}
+  constexpr explicit RealtimeThreadSafeBox(const T && init) : value_(std::move(init)) {}
 
   // Copy constructor
-  constexpr RealtimeBoxBase(const RealtimeBoxBase & o)
+  constexpr RealtimeThreadSafeBox(const RealtimeThreadSafeBox & o)
   {
     // Lock the other box mutex
     std::unique_lock<mutex_t> lock(o.lock_);
@@ -77,7 +85,7 @@ public:
   }
 
   // Copy assignment constructor
-  constexpr RealtimeBoxBase & operator=(const RealtimeBoxBase & o)
+  constexpr RealtimeThreadSafeBox & operator=(const RealtimeThreadSafeBox & o)
   {
     // Check for self assignment (and a potential deadlock)
     if (&o != this) {
@@ -90,7 +98,7 @@ public:
     return *this;
   }
 
-  constexpr RealtimeBoxBase(RealtimeBoxBase && o)
+  constexpr RealtimeThreadSafeBox(RealtimeThreadSafeBox && o)
   {
     // Lock the other box mutex
     std::unique_lock<mutex_t> lock(o.lock_);
@@ -100,14 +108,14 @@ public:
 
   // Only enabled for types that can be constructed from an initializer list
   template <typename U = T>
-  constexpr RealtimeBoxBase(
+  constexpr RealtimeThreadSafeBox(
     const std::initializer_list<U> & init,
     std::enable_if_t<std::is_constructible_v<U, std::initializer_list<U>>>)
   : value_(init)
   {
   }
 
-  constexpr RealtimeBoxBase & operator=(RealtimeBoxBase && o)
+  constexpr RealtimeThreadSafeBox & operator=(RealtimeThreadSafeBox && o)
   {
     // Check for self assignment (and a potential deadlock)
     if (&o != this) {
@@ -239,9 +247,9 @@ public:
   }
 
   /**
-   * @brief Wait until the mutex can be locked and set the content (RealtimeBox behavior)
+   * @brief Wait until the mutex can be locked and set the content (RealtimeThreadSafeBox behavior)
    * @note disabled for pointer types
-   * @note same signature as in the existing RealtimeBox<T>
+   * @note same signature as in the existing RealtimeThreadSafeBox<T>
    */
   template <typename U = T>
   typename std::enable_if_t<!is_ptr_or_smart_ptr<U>, void> set(const T & value)
@@ -252,8 +260,8 @@ public:
   }
 
   /**
-   * @brief Wait until the mutex can be locked and set the content (RealtimeBox behavior)
-   * @note same signature as in the existing RealtimeBox<T>
+   * @brief Wait until the mutex can be locked and set the content (RealtimeThreadSafeBox behavior)
+   * @note same signature as in the existing RealtimeThreadSafeBox<T>
    * @note Not the safest way to access pointer type content (rw)
    * @deprecated Use set(const std::function<void(T &)> & func) instead!
    */
@@ -282,7 +290,7 @@ public:
   }
 
   /**
-   * @brief Wait until the mutex could be locked and get the content (RealtimeBox behaviour)
+   * @brief Wait until the mutex could be locked and get the content (RealtimeThreadSafeBox behaviour)
    * @return copy of the value
    */
   template <typename U = T>
@@ -294,7 +302,7 @@ public:
 
   /**
    * @brief Wait until the mutex could be locked and get the content (r)
-   * @note same signature as in the existing RealtimeBox<T>
+   * @note same signature as in the existing RealtimeThreadSafeBox<T>
    */
   template <typename U = T>
   typename std::enable_if_t<!is_ptr_or_smart_ptr<U>, void> get(T & in) const
@@ -306,7 +314,7 @@ public:
 
   /**
    * @brief Wait until the mutex could be locked and get the content (r)
-   * @note same signature as in the existing RealtimeBox<T>
+   * @note same signature as in the existing RealtimeThreadSafeBox<T>
    * @note Not the safest way to access pointer type content (r)
    * @deprecated Use get(const std::function<void(const T &)> & func) instead!
    */
@@ -322,7 +330,7 @@ public:
   /**
    * @brief Wait until the mutex could be locked and access the content (r)
    * @note only safe way to access pointer type content (r)
-   * @note same signature as in the existing RealtimeBox<T>
+   * @note same signature as in the existing RealtimeThreadSafeBox<T>
    */
   void get(const std::function<void(const T &)> & func)
   {
@@ -385,24 +393,11 @@ private:
   mutable mutex_t lock_;
 };
 
-// Introduce some easier to use names
-
-// Only kept for compatibility reasons
-template <typename T, typename mutex_type = std::mutex>
-using RealtimeBoxBestEffort [[deprecated("Use RealtimeBox instead")]] =
-  RealtimeBoxBase<T, mutex_type>;
-
-// Provide specialisations for different mutex types
-template <typename T>
-using RealtimeBoxStandard = RealtimeBoxBase<T, std::mutex>;
+// Provide specialisations for other mutex types
 
 template <typename T>
-using RealtimeBoxRecursive = RealtimeBoxBase<T, std::recursive_mutex>;
-
-// This is the specialisation we recommend to use in the end
-template <typename T>
-using RealtimeBox = RealtimeBoxStandard<T>;
+using RealtimeThreadSafeBoxRecursive = RealtimeThreadSafeBox<T, RECURSIVE_MUTEX>;
 
 }  // namespace realtime_tools
 
-#endif  // REALTIME_TOOLS__REALTIME_BOX_HPP_
+#endif  // REALTIME_TOOLS__REALTIME_THREAD_SAFE_BOX_HPP_
