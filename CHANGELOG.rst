@@ -2,6 +2,25 @@
 Changelog for package realtime_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.6.0 (2025-05-25)
+------------------
+* Rename RealtimeBox to RealtimeThreadsafeBox and use `prio_inherit_mutex` (backport `#318 <https://github.com/ros-controls/realtime_tools/issues/318>`_) (`#341 <https://github.com/ros-controls/realtime_tools/issues/341>`_)
+* Use `Boost::boost` instead of ${Boost_LIBRARIES} and export it (backport `#333 <https://github.com/ros-controls/realtime_tools/issues/333>`_, `#336 <https://github.com/ros-controls/realtime_tools/issues/336>`_) (`#334 <https://github.com/ros-controls/realtime_tools/issues/334>`_)
+* Use target_link_libraries instead of ament_target_dependencies (backport `#331 <https://github.com/ros-controls/realtime_tools/issues/331>`_) (`#332 <https://github.com/ros-controls/realtime_tools/issues/332>`_)
+* Contributors: mergify[bot]
+
+3.5.1 (2025-05-04)
+------------------
+* Fix the deadlock in the destructor of RealtimePublisher (backport `#320 <https://github.com/ros-controls/realtime_tools/issues/320>`_) (`#325 <https://github.com/ros-controls/realtime_tools/issues/325>`_)
+* Contributors: mergify[bot]
+
+3.5.0 (2025-04-06)
+------------------
+* Fix realtime publisher race condition upon initialization (backport `#309 <https://github.com/ros-controls/realtime_tools/issues/309>`_) (`#311 <https://github.com/ros-controls/realtime_tools/issues/311>`_)
+* Move the package to a subfolder (backport `#295 <https://github.com/ros-controls/realtime_tools/issues/295>`_) (`#306 <https://github.com/ros-controls/realtime_tools/issues/306>`_)
+* Use ros2_control_cmake (backport `#293 <https://github.com/ros-controls/realtime_tools/issues/293>`_) (`#293 <https://github.com/ros-controls/realtime_tools/issues/293>`_)
+* Contributors: mergify[bot]
+
 3.4.0 (2025-02-19)
 ------------------
 * [RTPublisher] use NON_POLLING as default for the realtime pubisher  (backport `#280 <https://github.com/ros-controls/realtime_tools/issues/280>`_) (`#282 <https://github.com/ros-controls/realtime_tools/issues/282>`_)
