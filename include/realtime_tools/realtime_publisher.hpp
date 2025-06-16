@@ -195,10 +195,6 @@ public:
     updated_cond_.notify_one();
   }
 
-  std::thread & get_thread() { return thread_; }
-
-  const std::thread & get_thread() const { return thread_; }
-
 private:
   // non-copyable
   RealtimePublisher(const RealtimePublisher &) = delete;
